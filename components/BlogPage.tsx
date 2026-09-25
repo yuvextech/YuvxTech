@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState, useMemo } from 'react';
 import { useCMS } from '../context/CMSContext';
 import { BlogPost, Comment } from '../types';
+import NewsletterSection from './NewsletterSection';
 
 const READ_STORAGE_KEY = 'yuvex_read_posts';
 const COMMENTS_STORAGE_KEY = 'yuvex_blog_comments';
@@ -174,10 +175,13 @@ const BlogPage: React.FC<BlogPageProps> = ({ onBack, onSelectPost, initialPostId
               </div>
             </div>
             <img src={selectedPost.image} className="w-full h-[500px] object-cover rounded-[50px] mb-12 shadow-2xl" alt={selectedPost.title} />
-            <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-20">
+            <div className="prose dark:prose-invert max-w-none text-gray-700 dark:text-gray-300 text-lg leading-relaxed mb-12">
               {selectedPost.content || selectedPost.excerpt}
               <p className="mt-8">At Yuvex Tech, we explore the boundaries of what's possible in the digital realm. Join our community as we continue to push innovation forward.</p>
             </div>
+
+            {/* Newsletter Subscription for Readers */}
+            <NewsletterSection compact source={`Blog Article: ${selectedPost.title}`} className="my-10" />
           </article>
 
           <div className="border-t border-gray-100 dark:border-white/5 pt-16">
@@ -292,6 +296,9 @@ const BlogPage: React.FC<BlogPageProps> = ({ onBack, onSelectPost, initialPostId
             </div>
           ))}
         </div>
+
+        {/* Newsletter Subscription in Blog Hub */}
+        <NewsletterSection source="Blog Knowledge Base Hub" className="mt-16" />
       </div>
     </div>
   );

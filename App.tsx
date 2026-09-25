@@ -212,10 +212,13 @@ const AppContent: React.FC = () => {
   if (view === 'admin') {
     return (
       <div className="min-h-screen bg-gray-50 dark:bg-gray-950 text-gray-900 dark:text-gray-100">
-        <AnnouncementBar />
+        <AnnouncementBar onNavigate={(target) => navigateTo(target as ViewState)} />
         <AdminCMS 
+          onBackToSite={() => navigateTo('home')}
           onBack={() => navigateTo('home')} 
           onPreviewLive={() => navigateTo('home')} 
+          onNavigateToProject={(id) => navigateTo('explore-details', id)}
+          onNavigateToBlog={(id) => navigateTo('blog-detail', id)}
         />
       </div>
     );

@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { useCMS } from '../context/CMSContext';
+import NewsletterSection from './NewsletterSection';
 
 interface FooterProps {
   onNavigate: (view: 'home' | 'privacy' | 'portfolio' | 'contact' | 'about' | 'blog' | 'services' | 'testimonials' | 'brainstorm' | 'explore-details' | 'admin') => void;
@@ -12,6 +13,9 @@ const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
   return (
     <footer className="py-20 border-t border-gray-100 dark:border-white/5 bg-gray-50 dark:bg-gray-950 transition-colors">
       <div className="container mx-auto px-6">
+        {/* Newsletter Subscription Banner */}
+        <NewsletterSection source="Footer Newsletter" className="mb-16" />
+
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-20">
           <div className="md:col-span-2">
             <button 

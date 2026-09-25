@@ -119,7 +119,46 @@ export interface TestimonialItem {
   tag?: string;
 }
 
+export interface NewsletterSubscriber {
+  id: string;
+  email: string;
+  name?: string;
+  subscribedAt: string;
+  source: string;
+  status: 'active' | 'unsubscribed';
+  notificationsCount?: number;
+  lastNotifiedPostId?: string;
+  lastNotifiedAt?: string;
+}
+
+export interface PostNotificationLog {
+  id: string;
+  postId: string;
+  postTitle: string;
+  dispatchedAt: string;
+  recipientCount: number;
+  recipients: string[];
+}
+
+export interface UserRequest {
+  id: string;
+  source: string;
+  name: string;
+  email: string;
+  phone?: string;
+  projectType?: string;
+  budget?: string;
+  timeline?: string;
+  message: string;
+  metadata?: Record<string, any>;
+  createdAt: string;
+  status: 'unread' | 'read' | 'replied' | 'archived';
+  sentToEmail: string;
+  emailDispatched?: boolean;
+}
+
 export interface SiteSettings {
+  notificationsEmail?: string;
   announcement: {
     enabled: boolean;
     badge: string;

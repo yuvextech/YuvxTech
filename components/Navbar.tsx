@@ -147,14 +147,27 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, onToggl
             
             <div className="mt-12 flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full animate-in fade-in slide-in-from-left-8" style={{ animationDelay: `${navLinks.length * 60}ms` }}>
               <button 
-                onClick={() => { onNavigate('contact'); setIsMenuOpen(false); }}
-                className="px-10 py-5 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-500 transition-all text-center shadow-2xl shadow-blue-600/20 dark:shadow-blue-600/10 active:scale-95"
+                type="button"
+                aria-label="Start a Discussion / Contact Us"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  onNavigate('contact');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                className="cursor-pointer px-10 py-5 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-500 transition-all text-center shadow-2xl shadow-blue-600/30 dark:shadow-blue-600/20 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-500/40 flex items-center justify-center gap-2 text-base"
               >
-                Start a Discussion
+                <span>💬</span>
+                <span>Start a Discussion</span>
+                <span className="transition-transform group-hover:translate-x-1">→</span>
               </button>
               <button 
-                onClick={() => { onNavigate('admin'); setIsMenuOpen(false); }}
-                className="px-6 py-5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-800 dark:text-gray-200 font-bold rounded-2xl hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 transition-all text-center flex items-center justify-center gap-2"
+                type="button"
+                aria-label="Open Admin CMS"
+                onClick={() => {
+                  setIsMenuOpen(false);
+                  onNavigate('admin');
+                }}
+                className="cursor-pointer px-6 py-5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-800 dark:text-gray-200 font-bold rounded-2xl hover:bg-blue-600 hover:text-white dark:hover:bg-blue-600 transition-all text-center flex items-center justify-center gap-2 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-500/30 text-base"
               >
                 <span>⚙️</span>
                 <span>Admin CMS</span>

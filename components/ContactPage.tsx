@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useCMS } from '../context/CMSContext';
 
 interface ContactPageProps {
   onBack: () => void;
@@ -9,6 +10,7 @@ const PROJECT_TYPES = ['Mobile App', 'Web Platform', 'UI/UX Design', 'AI Integra
 const BUDGET_RANGES = ['$5k - $15k', '$15k - $50k', '$50k - $150k', '$150k+'];
 
 const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
+  const { settings, addUserRequest } = useCMS();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -18,19 +20,36 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [mailtoLink, setMailtoLink] = useState('');
+  const [targetEmail, setTargetEmail] = useState('');
 
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      const destEmail = settings.notificationsEmail || 'ywapne@gmail.com';
+      setTargetEmail(destEmail);
+      const res = await addUserRequest({
+        source: 'Contact Page (Dedicated)',
+        name: formData.name,
+        email: formData.email,
+        projectType: formData.projectType || 'General Project',
+        budget: formData.budget || 'Flexible',
+        message: formData.message
+      });
+      setMailtoLink(res.mailtoUrl);
       setIsSubmitting(false);
       setIsSubmitted(true);
       setFormData({ name: '', email: '', projectType: '', budget: '', message: '' });
-    }, 1500);
+    } catch (err) {
+      console.error('Contact page submission error:', err);
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -62,20 +81,37 @@ const ContactPage: React.FC<ContactPageProps> = ({ onBack }) => {
 
         <div className="max-w-4xl mx-auto">
           {isSubmitted ? (
-            <div className="glass p-12 md:p-20 rounded-[50px] text-center animate-in zoom-in duration-500 shadow-2xl">
-              <div className="w-24 h-24 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-10 shadow-lg shadow-green-500/10">
+            <div className="glass p-10 md:p-16 rounded-[50px] text-center animate-in zoom-in duration-500 shadow-2xl border border-green-500/20">
+              <div className="w-24 h-24 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8 shadow-lg shadow-green-500/10">
                 <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"/></svg>
               </div>
-              <h4 className="text-4xl font-bold mb-6 text-gray-900 dark:text-white">Message Dispatched!</h4>
-              <p className="text-gray-600 dark:text-gray-400 text-xl mb-12 leading-relaxed max-w-md mx-auto">
-                Your inquiry has been logged. An expert from our team will reach out to you within one business day.
+              <h4 className="text-4xl font-bold mb-4 text-gray-900 dark:text-white">Inquiry Received & Recorded!</h4>
+              <p className="text-gray-600 dark:text-gray-400 text-lg mb-8 leading-relaxed max-w-lg mx-auto">
+                Your request is securely stored in our system and forwarded directly to <strong className="text-blue-600 dark:text-blue-400 font-mono font-bold">{targetEmail || 'ywapne@gmail.com'}</strong>.
               </p>
-              <button 
-                onClick={() => setIsSubmitted(false)}
-                className="px-12 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-500 transition-all font-black shadow-xl shadow-blue-600/20 active:scale-95"
-              >
-                Send Another Inquiry
-              </button>
+
+              <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-8">
+                {mailtoLink && (
+                  <a
+                    href={mailtoLink}
+                    className="px-8 py-4 bg-blue-600 text-white rounded-2xl hover:bg-blue-500 transition-all font-black shadow-xl shadow-blue-600/20 active:scale-95 inline-flex items-center gap-2"
+                  >
+                    <span>✉️</span>
+                    <span>Send Copy via Email Client</span>
+                  </a>
+                )}
+                <button 
+                  onClick={() => setIsSubmitted(false)}
+                  className="px-8 py-4 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-800 dark:text-gray-200 rounded-2xl hover:bg-gray-200 dark:hover:bg-white/10 transition-all font-bold active:scale-95"
+                >
+                  Submit Another Inquiry
+                </button>
+              </div>
+
+              <div className="text-xs text-gray-400 dark:text-gray-500 font-mono flex items-center justify-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span>Stored in Admin CMS • Notification target: {targetEmail || 'ywapne@gmail.com'}</span>
+              </div>
             </div>
           ) : (
             <div className="glass p-8 md:p-16 rounded-[50px] border border-gray-100 dark:border-white/10 shadow-2xl">

@@ -23,6 +23,7 @@ const ExploreDetailsPage: React.FC<ExploreDetailsPageProps> = ({
   const [activeTab, setActiveTab] = useState<TabType>('architecture');
   const [activeCategoryFilter, setActiveCategoryFilter] = useState<string>('All');
   const [copiedCode, setCopiedCode] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
   const [previewViewMode, setPreviewViewMode] = useState<'interface' | 'architecture' | 'gallery'>('interface');
   const [activeGalleryIndex, setActiveGalleryIndex] = useState(0);
 
@@ -61,21 +62,36 @@ const ExploreDetailsPage: React.FC<ExploreDetailsPageProps> = ({
   }, [currentProject.id]);
 
   const handleCopyCode = (code: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCode(true);
-    setTimeout(() => setCopiedCode(false), 2000);
+    try {
+      navigator.clipboard.writeText(code);
+      setCopiedCode(true);
+      setTimeout(() => setCopiedCode(false), 2000);
+    } catch (e) {
+      console.error('Clipboard copy failed:', e);
+    }
   };
 
   const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title: `${currentProject.title} | Yuvex Tech Explore Details`,
-        text: currentProject.description,
-        url: window.location.href,
-      }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(window.location.href);
-      alert('Case study link copied to clipboard!');
+    try {
+      if (navigator.share) {
+        navigator.share({
+          title: `${currentProject.title} | Yuvex Tech Explore Details`,
+          text: currentProject.description,
+          url: window.location.href,
+        }).catch(() => {
+          if (navigator.clipboard) {
+            navigator.clipboard.writeText(window.location.href);
+            setShareCopied(true);
+            setTimeout(() => setShareCopied(false), 2500);
+          }
+        });
+      } else if (navigator.clipboard) {
+        navigator.clipboard.writeText(window.location.href);
+        setShareCopied(true);
+        setTimeout(() => setShareCopied(false), 2500);
+      }
+    } catch (e) {
+      console.error('Share failed:', e);
     }
   };
 
@@ -110,7 +126,7 @@ const ExploreDetailsPage: React.FC<ExploreDetailsPageProps> = ({
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
               </svg>
-              <span>Share</span>
+              <span>{shareCopied ? 'Link Copied!' : 'Share'}</span>
             </button>
             <button
               onClick={onContact}

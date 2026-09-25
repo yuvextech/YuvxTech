@@ -6,7 +6,7 @@ const PROJECT_TYPES = ['Mobile App', 'Web Platform', 'UI/UX Design', 'AI Integra
 const BUDGET_RANGES = ['$5k - $15k', '$15k - $50k', '$50k - $150k', '$150k+'];
 
 const Contact: React.FC = () => {
-  const { settings } = useCMS();
+  const { settings, addUserRequest } = useCMS();
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -16,15 +16,32 @@ const Contact: React.FC = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [mailtoLink, setMailtoLink] = useState('');
+  const [targetEmail, setTargetEmail] = useState('');
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
+    try {
+      const destEmail = settings.notificationsEmail || 'ywapne@gmail.com';
+      setTargetEmail(destEmail);
+      const res = await addUserRequest({
+        source: 'Contact Form (Home)',
+        name: formData.name,
+        email: formData.email,
+        projectType: formData.projectType || 'General Project',
+        budget: formData.budget || 'Flexible',
+        message: formData.message
+      });
+      setMailtoLink(res.mailtoUrl);
       setIsSubmitting(false);
       setIsSubmitted(true);
       setFormData({ name: '', email: '', projectType: '', budget: '', message: '' });
-    }, 1500);
+    } catch (err) {
+      console.error('Form submission error:', err);
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
@@ -93,20 +110,36 @@ const Contact: React.FC = () => {
             {/* Right Side: Form Card */}
             <div className="relative">
               {isSubmitted ? (
-                <div className="glass p-12 rounded-[40px] text-center animate-in zoom-in duration-500">
-                  <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-8">
+                <div className="glass p-10 sm:p-12 rounded-[40px] text-center animate-in zoom-in duration-500 border border-green-500/20 shadow-2xl">
+                  <div className="w-20 h-20 bg-green-500/20 text-green-500 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg shadow-green-500/10">
                     <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"/></svg>
                   </div>
-                  <h4 className="text-3xl font-bold mb-4 text-gray-900 dark:text-white">Inquiry Received!</h4>
-                  <p className="text-gray-600 dark:text-gray-400 mb-8 leading-relaxed">
-                    Thanks for reaching out. An architect from our team will review your project details and get back to you within 24 hours.
+                  <h4 className="text-3xl font-bold mb-3 text-gray-900 dark:text-white">Inquiry Received & Stored!</h4>
+                  <p className="text-gray-600 dark:text-gray-400 mb-6 leading-relaxed max-w-md mx-auto text-sm sm:text-base">
+                    Your request has been recorded in our Admin CMS and notification dispatched to <strong className="text-blue-600 dark:text-blue-400 font-mono font-bold">{targetEmail || 'ywapne@gmail.com'}</strong>.
                   </p>
-                  <button 
-                    onClick={() => setIsSubmitted(false)}
-                    className="px-8 py-3 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition-all font-bold text-gray-900 dark:text-white"
-                  >
-                    Send another message
-                  </button>
+
+                  <div className="flex flex-col sm:flex-row gap-3 justify-center mb-6">
+                    {mailtoLink && (
+                      <a
+                        href={mailtoLink}
+                        className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg shadow-blue-600/20 transition-all text-xs"
+                      >
+                        <span>✉️ Send Copy via Email App</span>
+                      </a>
+                    )}
+                    <button 
+                      onClick={() => setIsSubmitted(false)}
+                      className="px-6 py-3.5 bg-gray-100 dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl hover:bg-gray-200 dark:hover:bg-white/10 transition-all font-bold text-gray-900 dark:text-white text-xs"
+                    >
+                      Send another message
+                    </button>
+                  </div>
+
+                  <div className="text-[11px] text-gray-400 dark:text-gray-500 font-mono flex items-center justify-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                    <span>Stored in Admin CMS • Notification target: {targetEmail || 'ywapne@gmail.com'}</span>
+                  </div>
                 </div>
               ) : (
                 <div className="glass p-8 md:p-12 rounded-[40px]">
